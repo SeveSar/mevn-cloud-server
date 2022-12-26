@@ -1,0 +1,6 @@
+{
+  "serverPort": 5000,
+  "dbUrl": "mongodb+srv://sevesar:2235672@cluster0.tuqhcsk.mongodb.net/?retryWrites=true&w=majority",
+  "secretKey": "mevn-secret-key",
+  "filePath": "D:\\frontend\\works\\mevn-cloud\\server\\files"
+}
