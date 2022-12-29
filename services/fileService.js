@@ -31,6 +31,7 @@ class FileService {
         }
         return resolve({ message: "File was deleted" });
       } catch (e) {
+        console.log(e);
         return reject({ message: "Folder is not empty" });
       }
     });
