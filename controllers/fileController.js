@@ -5,6 +5,7 @@ const User = require("../models/User");
 const File = require("../models/File");
 const uuid = require("uuid");
 const ApiError = require("../exceptions/apiError");
+const path = require("path");
 class FileController {
   async createDir(req, res) {
     try {
@@ -14,10 +15,10 @@ class FileController {
 
       if (!parentFile) {
         file.path = name;
-        await fileService.createDir(file);
+        await fileService.createDir(req, file);
       } else {
         file.path = `${parentFile.path}\\${file.name}`;
-        await fileService.createDir(file);
+        await fileService.createDir(req, file);
         parentFile.childs.push(file._id);
         await parentFile.save();
       }
@@ -83,9 +84,9 @@ class FileController {
 
       let path;
       if (parent) {
-        path = `${process.env.FILE_PATH}\\${user._id}\\${parent.path}\\${file.name}`;
+        path = `${req.filePath}\\${user._id}\\${parent.path}\\${file.name}`;
       } else {
-        path = `${process.env.FILE_PATH}\\${user._id}\\${file.name}`;
+        path = `${req.filePath}\\${user._id}\\${file.name}`;
       }
 
       if (fs.existsSync(path)) {
@@ -120,7 +121,7 @@ class FileController {
     try {
       const file = await File.findOne({ _id: req.query.id, user: req.user.id });
 
-      let path = fileService.getPath(file);
+      let path = fileService.getPath(req, file);
       if (!fs.existsSync(path)) {
         return res.status(400).json({ message: "There is not file" });
       }
@@ -135,11 +136,11 @@ class FileController {
     try {
       const id = req.query.id;
       const file = await File.findOne({ _id: id, user: req.user.id });
-      console.log(file);
+
       if (!file) {
         return res.status(400).json({ message: "File not found" });
       }
-      await fileService.deleteFile(file);
+      await fileService.deleteFile(req, file);
       file.remove();
       return res.json({ message: "File was deleted" });
     } catch (e) {
@@ -162,7 +163,8 @@ class FileController {
       const file = req.files.file;
       const user = await User.findById(req.user.id);
       const avatarName = uuid.v4() + ".jpg";
-      file.mv(process.env.STATIC_PATH + "\\" + avatarName);
+      console.log(path.resolve(__dirname, "static"));
+      file.mv(path.resolve(__dirname, "../static") + "\\" + avatarName);
       user.avatar = avatarName;
       await user.save();
       return res.json(user);
@@ -173,7 +175,7 @@ class FileController {
   async deleteAvatar(req, res, next) {
     try {
       const user = await User.findById(req.user.id);
-      fs.unlinkSync(process.env.STATIC_PATH + "\\" + user.avatar);
+      fs.unlinkSync(path.resolve(__dirname, "../static") + "\\" + user.avatar);
       user.avatar = null;
       await user.save();
       return res.json(user);

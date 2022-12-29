@@ -21,7 +21,7 @@ class UserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
-      fileService.createDir(new File({ user: userDto.id, name: "" }));
+      fileService.createDir(req, new File({ user: userDto.id, name: "" }));
       return res.json({
         success: true,
         ...tokens,

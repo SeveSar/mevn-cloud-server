@@ -4,10 +4,10 @@ const fs = require("fs");
 const config = require("config");
 
 class FileService {
-  createDir(file) {
+  createDir(req, file) {
     return new Promise((resolve, reject) => {
       try {
-        const filePath = this.getPath(file);
+        const filePath = this.getPath(req, file);
         // файл/папка по такому пути не существует
         if (!fs.existsSync(filePath)) {
           fs.mkdirSync(filePath);
@@ -20,10 +20,10 @@ class FileService {
       }
     });
   }
-  deleteFile(file) {
+  deleteFile(req, file) {
     return new Promise((resolve, reject) => {
       try {
-        const path = this.getPath(file);
+        const path = this.getPath(req, file);
         if (file.type === "dir") {
           fs.rmdirSync(path);
         } else {
@@ -45,8 +45,8 @@ class FileService {
   //     } catch (e) {}
   //   });
   // }
-  getPath(file) {
-    return process.env.FILE_PATH + "\\" + file.user + "\\" + file.path;
+  getPath(req, file) {
+    return req.filePath + "\\" + file.user + "\\" + file.path;
   }
 }
 

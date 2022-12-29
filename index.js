@@ -11,7 +11,7 @@ const app = express();
 const cors = require("cors");
 const PORT = process.env.PORT || 5000;
 const errorMiddleware = require("./middleware/error.middleware");
-
+const filePathMiddleware = require("./middleware/filePath.middleware");
 // const corsMiddleware = require("./middleware/cors.middleware");
 
 const whitelist = ["http://localhost:5173", "http://localhost:4173", "*"];
@@ -25,14 +25,16 @@ const corsOptions = {
     }
   },
 };
+
 app.use(cookieParser());
 app.use(fileUpload({}));
-// app.use(corsMiddleware);
 app.use(cors(corsOptions));
+app.use(filePathMiddleware(path.resolve(__dirname, "files")));
 
 app.use(express.json());
 
-app.use(express.static("static")); //указываем путь до статик папки для сервера
+app.use(express.static(path.join(process.env.PWD, "static")));
+
 app.use("/api/auth", authRouter);
 app.use("/api/files", fileRouter);
 app.use("/users", usersRouter);
