@@ -163,8 +163,8 @@ class FileController {
       const file = req.files.file;
       const user = await User.findById(req.user.id);
       const avatarName = uuid.v4() + ".jpg";
-      console.log(path.resolve(__dirname, "../static"), avatarName);
-      file.mv(path.resolve(__dirname, "../static") + "/" + avatarName);
+      console.log(path.resolve(__dirname, "../public"), avatarName);
+      file.mv(path.resolve(__dirname, "../public") + "/" + avatarName);
       user.avatar = avatarName;
       await user.save();
       return res.json(user);

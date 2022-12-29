@@ -28,6 +28,7 @@ class UserController {
         user: userDto,
       });
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
