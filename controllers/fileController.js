@@ -163,12 +163,13 @@ class FileController {
       const file = req.files.file;
       const user = await User.findById(req.user.id);
       const avatarName = uuid.v4() + ".jpg";
-      console.log(path.resolve(__dirname, "static"));
+
       file.mv(path.resolve(__dirname, "../static") + "/" + avatarName);
       user.avatar = avatarName;
       await user.save();
       return res.json(user);
     } catch (e) {
+      console.log(e);
       next(new ApiError(500, "Upload avatar error"));
     }
   }
