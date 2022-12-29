@@ -8,7 +8,6 @@ class FileService {
     return new Promise((resolve, reject) => {
       try {
         const filePath = this.getPath(req, file);
-        console.log(filePath, "filepat cerat");
         // файл/папка по такому пути не существует
         if (!fs.existsSync(filePath)) {
           fs.mkdirSync(filePath);
@@ -25,7 +24,6 @@ class FileService {
     return new Promise((resolve, reject) => {
       try {
         const path = this.getPath(req, file);
-        console.log("delete", path);
         if (file.type === "dir") {
           fs.rmdirSync(path);
         } else {
@@ -33,7 +31,6 @@ class FileService {
         }
         return resolve({ message: "File was deleted" });
       } catch (e) {
-        console.log(e);
         return reject({ message: "Folder is not empty" });
       }
     });
@@ -49,7 +46,7 @@ class FileService {
   //   });
   // }
   getPath(req, file) {
-    return req.filePath + "/" + file.user + "/" + file.path;
+    return req.filePath + "\\" + file.user + "\\" + file.path;
   }
 }
 
