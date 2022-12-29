@@ -33,7 +33,7 @@ app.use(filePathMiddleware(path.resolve(__dirname, "files")));
 
 app.use(express.json());
 
-app.use(express.static(path.join(process.env.PWD, "static")));
+app.use(express.static(__dirname + "/static"));
 console.log(__filename, "filename");
 app.use("/api/auth", authRouter);
 app.use("/api/files", fileRouter);
