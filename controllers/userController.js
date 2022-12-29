@@ -18,7 +18,8 @@ class UserController {
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         secure: true,
-        domain: ".onrender.com",
+        sameSite: "none",
+        domain: "localhost",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
@@ -43,7 +44,8 @@ class UserController {
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         secure: true,
-        domain: ".onrender.com",
+        sameSite: "none",
+        domain: "localhost",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
@@ -74,7 +76,8 @@ class UserController {
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         secure: true,
-        domain: ".onrender.com",
+        sameSite: "none",
+        domain: "localhost",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
       return res.json({
