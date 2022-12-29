@@ -14,7 +14,12 @@ const errorMiddleware = require("./middleware/error.middleware");
 const filePathMiddleware = require("./middleware/filePath.middleware");
 // const corsMiddleware = require("./middleware/cors.middleware");
 
-const whitelist = ["http://localhost:5173", "http://localhost:4173", "*"];
+const whitelist = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "*",
+  "192.168.56.1",
+];
 const corsOptions = {
   credentials: true,
   origin: function (origin, callback) {
