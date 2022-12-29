@@ -19,7 +19,7 @@ class UserController {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain: ".onrender.com",
+        domain: "mevn-cloud.onrender.com",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
@@ -45,7 +45,7 @@ class UserController {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain: ".onrender.com",
+        domain: "mevn-cloud.onrender.com",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
@@ -77,7 +77,7 @@ class UserController {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        domain: ".onrender.com",
+        domain: "mevn-cloud.onrender.com",
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
       return res.json({
