@@ -7,7 +7,7 @@ class UserDto {
   constructor(model) {
     this.id = model._id;
     this.email = model.email;
-    this.diskSpac = model.diskSpace;
+    this.diskSpace = model.diskSpace;
     this.usedSpace = model.usedSpace;
     this.avatar = model.avatar;
   }

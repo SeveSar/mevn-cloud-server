@@ -1,6 +1,5 @@
 const ApiError = require("../exceptions/apiError");
 module.exports = function (err, req, res, next) {
-  console.log(err, "error midlew");
   if (err instanceof ApiError) {
     return res
       .status(err.status)

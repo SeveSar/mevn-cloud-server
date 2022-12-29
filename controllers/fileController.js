@@ -3,7 +3,8 @@ const config = require("config");
 const fs = require("fs");
 const User = require("../models/User");
 const File = require("../models/File");
-
+const uuid = require("uuid");
+const ApiError = require("../exceptions/apiError");
 class FileController {
   async createDir(req, res) {
     try {
@@ -23,7 +24,6 @@ class FileController {
       await file.save();
       return res.json(file);
     } catch (e) {
-      console.log(e, "FAWFWA");
       return res.status(400).json(e);
     }
   }
@@ -69,7 +69,6 @@ class FileController {
   async uploadFile(req, res) {
     try {
       const file = req.files.file;
-
       const parent = await File.findOne({
         user: req.user.id,
         _id: req.body.parent,
@@ -80,11 +79,9 @@ class FileController {
       if (user.usedSpace + file.size > user.diskSpace) {
         return res.status(400).json({ message: "There no space on the disk" });
       }
-
       user.usedSpace = user.usedSpace + file.size;
 
       let path;
-
       if (parent) {
         path = `${process.env.FILE_PATH}\\${user._id}\\${parent.path}\\${file.name}`;
       } else {
@@ -98,7 +95,7 @@ class FileController {
       const type = file.name.split(".").pop();
       let filePath = file.name;
       if (parent) {
-        filePath = parent.parent + "\\" + file.name;
+        filePath = parent.path + "\\" + file.name;
       }
       const dbFile = new File({
         name: file.name,
@@ -138,6 +135,7 @@ class FileController {
     try {
       const id = req.query.id;
       const file = await File.findOne({ _id: id, user: req.user.id });
+      console.log(file);
       if (!file) {
         return res.status(400).json({ message: "File not found" });
       }
@@ -157,6 +155,30 @@ class FileController {
     } catch (e) {
       console.log(e);
       return res.status(500).json({ message: "Search Error" });
+    }
+  }
+  async uploadAvatar(req, res, next) {
+    try {
+      const file = req.files.file;
+      const user = await User.findById(req.user.id);
+      const avatarName = uuid.v4() + ".jpg";
+      file.mv(process.env.STATIC_PATH + "\\" + avatarName);
+      user.avatar = avatarName;
+      await user.save();
+      return res.json(user);
+    } catch (e) {
+      next(new ApiError(500, "Upload avatar error"));
+    }
+  }
+  async deleteAvatar(req, res, next) {
+    try {
+      const user = await User.findById(req.user.id);
+      fs.unlinkSync(process.env.STATIC_PATH + "\\" + user.avatar);
+      user.avatar = null;
+      await user.save();
+      return res.json(user);
+    } catch (e) {
+      next(new ApiError(500, "Delete avatar error"));
     }
   }
 }

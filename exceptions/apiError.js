@@ -1,5 +1,5 @@
 class ApiError extends Error {
-  static;
+  status;
   errors;
   constructor(status, message, errors) {
     super(message);

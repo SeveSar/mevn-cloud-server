@@ -34,6 +34,9 @@ class UserController {
   async login(req, res, next) {
     try {
       const { email, password } = req.body;
+      if (typeof password === "number") {
+        throw new ApiError(500, "Password must be a string");
+      }
       const { tokens, userDto } = await userService.login(email, password);
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
@@ -47,6 +50,7 @@ class UserController {
         user: userDto,
       });
     } catch (e) {
+      console.log(e);
       next(e);
     }
   }
