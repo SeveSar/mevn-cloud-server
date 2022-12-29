@@ -18,7 +18,7 @@ const whitelist = [
   "http://localhost:5173",
   "http://localhost:4173",
   "*",
-  "192.168.56.1",
+  "https://mevn-cloud.onrender.com",
 ];
 const corsOptions = {
   credentials: true,
