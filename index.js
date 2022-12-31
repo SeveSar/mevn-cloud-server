@@ -19,7 +19,7 @@ const whitelist = [
   "http://localhost:4173",
   "*",
   "https://mevn-cloud.onrender.com",
-  "https://mevn-cloud-jmfz6shq4-sevesar.vercel.app",
+  "https://mevn-cloud.vercel.app",
 ];
 const corsOptions = {
   credentials: true,
