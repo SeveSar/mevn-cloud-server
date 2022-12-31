@@ -3,6 +3,7 @@ const fileService = require("../services/fileService");
 const File = require("../models/File");
 const ApiError = require("../exceptions/apiError");
 const { validationResult } = require("express-validator");
+
 class UserController {
   async registration(req, res, next) {
     try {
@@ -37,7 +38,7 @@ class UserController {
   async login(req, res, next) {
     try {
       const { email, password } = req.body;
-      if (typeof password === "number") {
+      if (typeof password !== "string") {
         throw new ApiError(500, "Password must be a string");
       }
       const { tokens, userDto } = await userService.login(email, password);

@@ -35,16 +35,7 @@ class FileService {
       }
     });
   }
-  // uploadFile(file) {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const parent = await File.findOne({
-  //         user: req.user.id,
-  //         _id: req.body.parent,
-  //       });
-  //     } catch (e) {}
-  //   });
-  // }
+
   getPath(req, file) {
     return req.filePath + "\\" + file.user + "\\" + file.path;
   }

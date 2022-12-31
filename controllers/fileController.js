@@ -25,6 +25,7 @@ class FileController {
       await file.save();
       return res.json(file);
     } catch (e) {
+      console.log(e);
       return res.status(400).json(e);
     }
   }
@@ -50,13 +51,13 @@ class FileController {
           files = await File.find({
             user: req.user.id,
             parent: req.query.parent,
-          }).sort({ date: 1 });
+          }).sort({ date: -1 });
           break;
         default:
           files = await File.find({
             user: req.user.id,
             parent: req.query.parent,
-          });
+          }).sort({ date: -1 });
           break;
       }
 
@@ -176,7 +177,7 @@ class FileController {
   async deleteAvatar(req, res, next) {
     try {
       const user = await User.findById(req.user.id);
-      fs.unlinkSync(path.resolve(__dirname, "../static") + "/" + user.avatar);
+      fs.unlinkSync(path.resolve(__dirname, "../public") + "/" + user.avatar);
       user.avatar = null;
       await user.save();
       return res.json(user);
