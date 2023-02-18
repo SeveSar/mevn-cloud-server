@@ -36,7 +36,7 @@ app.use(cookieParser());
 app.use(fileUpload({}));
 app.use(cors(corsOptions));
 app.use(filePathMiddleware(path.resolve(__dirname, "files")));
-console.log(path.resolve("dist"), "resolve");
+
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "public")));

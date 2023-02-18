@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const RefreshToken = require("../models/RefreshToken");
+
 class TokenService {
   generateTokens(payload) {
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
@@ -17,7 +18,7 @@ class TokenService {
     const tokenData = await RefreshToken.findOne({ user: userId });
     if (tokenData) {
       tokenData.refreshToken = refreshToken;
-      return tokenData.save();
+      return await tokenData.save();
     }
     const token = await RefreshToken.create({
       user: userId,

@@ -1,39 +1,41 @@
 // бизнес логика
-const fs = require("fs");
-
+const fs = require("fs/promises");
+const ApiError = require("../exceptions/apiError");
 const config = require("config");
 
+const checkIsExist = async (path) => {
+  return fs
+    .stat(path)
+    .then(() => true)
+    .catch(() => false);
+};
+
 class FileService {
-  createDir(req, file) {
-    return new Promise((resolve, reject) => {
-      try {
-        const filePath = this.getPath(req, file);
-        // файл/папка по такому пути не существует
-        if (!fs.existsSync(filePath)) {
-          fs.mkdirSync(filePath);
-          return resolve({ message: "File was created" });
-        } else {
-          return reject({ message: "File already exists" });
-        }
-      } catch (e) {
-        return reject({ message: "File error" });
-      }
-    });
+  async createDir(req, file) {
+    const filePath = this.getPath(req, file);
+    const isFileExist = await checkIsExist(filePath);
+    if (!isFileExist) {
+      await fs.mkdir(filePath).catch(() => {
+        throw new ApiError(400, "File create Error");
+      });
+      return { message: "File was created" };
+    } else {
+      throw new ApiError(400, "File already exists");
+    }
   }
-  deleteFile(req, file) {
-    return new Promise((resolve, reject) => {
-      try {
-        const path = this.getPath(req, file);
-        if (file.type === "dir") {
-          fs.rmdirSync(path);
-        } else {
-          fs.unlinkSync(path);
-        }
-        return resolve({ message: "File was deleted" });
-      } catch (e) {
-        return reject({ message: "Folder is not empty" });
+  async deleteFile(req, file) {
+    try {
+      const path = this.getPath(req, file);
+      if (file.type === "dir") {
+        await fs.rm(path, { recursive: true, force: true });
+      } else {
+        await fs.unlink(path);
       }
-    });
+      return { message: "File was deleted" };
+    } catch (e) {
+      console.log(e);
+      throw new ApiError(500, "Error delete file");
+    }
   }
 
   getPath(req, file) {

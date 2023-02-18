@@ -6,10 +6,14 @@ const File = require("../models/File");
 const uuid = require("uuid");
 const ApiError = require("../exceptions/apiError");
 const path = require("path");
+
 class FileController {
-  async createDir(req, res) {
+  async createDir(req, res, next) {
     try {
       const { name, type, parent } = req.body;
+      if (!name) {
+        return next(new ApiError(400, "Name must not be empty!"));
+      }
       const file = new File({ name, type, parent, user: req.user.id });
       const parentFile = await File.findOne({ _id: parent });
 
@@ -26,7 +30,7 @@ class FileController {
       return res.json(file);
     } catch (e) {
       console.log(e);
-      return res.status(400).json(e);
+      next(e);
     }
   }
 
@@ -89,7 +93,7 @@ class FileController {
       } else {
         path = `${req.filePath}\\${user._id}\\${file.name}`;
       }
-
+      console.log(path, "path");
       if (fs.existsSync(path)) {
         return res.status(400).json({ message: "File already exist" });
       }
@@ -99,6 +103,7 @@ class FileController {
       if (parent) {
         filePath = parent.path + "\\" + file.name;
       }
+      console.log(filePath, "filePath");
       const dbFile = new File({
         name: file.name,
         type,
@@ -107,7 +112,9 @@ class FileController {
         parent: parent?._id,
         user: user._id,
       });
-
+      // if (parent) {
+      //   file.childs.push();
+      // }
       await dbFile.save();
       await user.save();
 
@@ -133,26 +140,50 @@ class FileController {
       return res.status(500).json({ message: "Download error" });
     }
   }
-  async deleteFile(req, res) {
+  async deleteFile(req, res, next) {
     try {
       const id = req.query.id;
       const file = await File.findOne({ _id: id, user: req.user.id });
-
       if (!file) {
         return res.status(400).json({ message: "File not found" });
       }
-      await fileService.deleteFile(req, file);
-      file.remove();
+      const removedChildsPromises = this.removeAllChilds(file);
+      const removedFilefileDb = file.remove();
+      const removedFilePhysicPromises = fileService.deleteFile(req, file);
+      await Promise.all([
+        removedChildsPromises,
+        removedFilefileDb,
+        removedFilePhysicPromises,
+      ]);
       return res.json({ message: "File was deleted" });
     } catch (e) {
-      return res.status(500).json({ message: e.message || "Delete error" });
+      next(e);
     }
+  }
+  async removeAllChilds(file) {
+    if (!file.childs.length) return false;
+    const descendants = [];
+    const stack = [file];
+    while (stack.length > 0) {
+      const currentNode = stack.pop();
+      const children = await File.find({
+        _id: { $in: currentNode.childs },
+      }).exec();
+      children.forEach((child) => {
+        descendants.push(child._id);
+        if (child.childs.length > 0) {
+          stack.push(child);
+        }
+      });
+    }
+    return File.deleteMany({ _id: { $in: descendants } }).exec();
   }
   async searchFile(req, res) {
     try {
       const searchName = req.query.search;
       let files = await File.find({ user: req.user.id });
       files = files.filter((file) => file.name.includes(searchName));
+
       return res.json(files);
     } catch (e) {
       console.log(e);
@@ -164,7 +195,6 @@ class FileController {
       const file = req.files.file;
       const user = await User.findById(req.user.id);
       const avatarName = uuid.v4() + ".jpg";
-      console.log(path.resolve(__dirname, "../public"), avatarName);
       file.mv(path.resolve(__dirname, "../public") + "/" + avatarName);
       user.avatar = avatarName;
       await user.save();
